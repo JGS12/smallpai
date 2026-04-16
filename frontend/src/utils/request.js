@@ -9,17 +9,25 @@ const BASE_URL = 'http://111.231.44.183:3000/api'
  * @param {Object} [options.data] - 请求数据
  */
 export const request = (options) => {
+    const token = uni.getStorageSync('token')
+
     return new Promise((resolve, reject) => {
         uni.request({
             url: BASE_URL + options.url,
             method: options.method || 'GET',
             data: options.data || {},
             header: {
-                'Content-Type': 'application/json'
+                'Authorization': token ? `Bearer ${token}` : '',
+                ...options.header
             },
             success: (res) => {
                 if (res.data.code === 0) {
                     resolve(res.data.data)
+                } else if (res.data.code === 401) {
+                    // Token 失效，清空并跳转
+                    uni.removeStorageSync('token')
+                    uni.reLaunch({ url: '/pages/login/index' })
+                    reject(res.data)
                 } else {
                     uni.showToast({
                         title: res.data.message || '请求失败',

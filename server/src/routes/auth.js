@@ -1,6 +1,6 @@
 'use strict'
 
-const Router = require('@koa/router')
+const Router = require('koa-router')
 const authController = require('../controllers/authController')
 
 const router = new Router()

@@ -1,56 +1,93 @@
 'use strict'
 
-const db = require('../utils/db')
-const crypto = require('crypto')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const { query } = require('../utils/db')
+
+const JWT_SECRET = process.env.JWT_SECRET || 'paipai-mini-secret-key'
 
 /**
- * 简单的 md5 加密
- * @param {string} password 
- */
-const hashPassword = (password) => {
-    return crypto.createHash('md5').update(password + 'paipai-mini-salt').digest('hex')
-}
-
-/**
- * 注册用户
+ * 用户注册
  */
 const register = async ({ username, password, invitationCode }) => {
-    // 1. 检查邀请码
-    const codes = await db.query('SELECT * FROM invitation_codes WHERE code = ? AND is_used = 0', [invitationCode])
-    if (codes.length === 0) {
-        throw new Error('无效或已被使用的邀请码')
+    if (!username || !password) {
+        throw new Error('用户名和密码不能为空')
     }
-    const codeId = codes[0].id
 
-    // 2. 检查用户名
-    const users = await db.query('SELECT * FROM users WHERE username = ?', [username])
-    if (users.length > 0) {
+    if (username.length < 2 || username.length > 50) {
+        throw new Error('用户名长度需在2-50个字符之间')
+    }
+
+    if (password.length < 6) {
+        throw new Error('密码长度不能少于6位')
+    }
+
+    // 检查用户名是否已存在
+    const existing = await query('SELECT id FROM users WHERE username = ?', [username])
+    if (existing.length > 0) {
         throw new Error('用户名已存在')
     }
 
-    // 3. 创建用户
-    const hashed = hashPassword(password)
-    const result = await db.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashed])
-    const userId = result.insertId
+    // 密码加密
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(password, salt)
 
-    // 4. 标记邀请码已使用
-    await db.query('UPDATE invitation_codes SET is_used = 1, used_by_id = ? WHERE id = ?', [userId, codeId])
+    // 插入用户
+    const result = await query(
+        'INSERT INTO users (username, password, role, invitation_code, created_at) VALUES (?, ?, ?, ?, NOW())',
+        [username, hashedPassword, 'member', invitationCode || null]
+    )
 
-    return { id: userId, username }
+    // 生成 JWT token
+    const token = jwt.sign(
+        { id: result.insertId, username },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+    )
+
+    return {
+        id: result.insertId,
+        username,
+        role: 'member',
+        token
+    }
 }
 
 /**
- * 登录
+ * 用户登录
  */
 const login = async ({ username, password }) => {
-    const hashed = hashPassword(password)
-    const users = await db.query('SELECT id, username, role FROM users WHERE username = ? AND password = ?', [username, hashed])
-
-    if (users.length === 0) {
-        throw new Error('用户名或密码错误')
+    if (!username || !password) {
+        throw new Error('用户名和密码不能为空')
     }
 
-    return users[0]
+    // 查找用户
+    const users = await query('SELECT * FROM users WHERE username = ?', [username])
+    if (users.length === 0) {
+        throw new Error('用户不存在')
+    }
+
+    const user = users[0]
+
+    // 验证密码
+    const isMatch = await bcrypt.compare(password, user.password)
+    if (!isMatch) {
+        throw new Error('密码错误')
+    }
+
+    // 生成 JWT token
+    const token = jwt.sign(
+        { id: user.id, username: user.username },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+    )
+
+    return {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        token
+    }
 }
 
 module.exports = {

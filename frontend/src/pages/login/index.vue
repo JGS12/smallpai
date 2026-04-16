@@ -34,10 +34,11 @@ const handleSubmit = async () => {
       data: form.value
     })
     
-    // 登录或注册成功后处理
+    // 登录或注册成功后处理，res 即后端返回的 data: { id, username, role, token }
+    const { token, ...userInfo } = res
     userStore.setLoginInfo({
-      userInfo: res,
-      token: 'mock-jwt-token-' + res.id // 第一版先用模拟 token
+      userInfo,
+      token
     })
     
     uni.showToast({ title: isRegister.value ? '注册成功' : '欢迎回来', icon: 'success' })

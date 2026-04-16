@@ -2,10 +2,14 @@
 import { onLaunch, onShow, onHide } from '@dcloudio/uni-app'
 
 onLaunch(() => {
-  // 仅在非登录页且无 token 时跳转
-  // 注意：小程序启动时无法通过 getCurrentPages 准确获取首屏路径
-  // 我们可以通过把登录页设为 pages.json 的第一个实现自然加载
-  console.log('App Launch')
+  // 检查登录态，未登录则跳转登录页
+  const token = uni.getStorageSync('token')
+  const pages = getCurrentPages()
+  const currentPage = pages.length > 0 ? pages[pages.length - 1].route : ''
+
+  if (!token && currentPage !== 'pages/login/index') {
+    uni.reLaunch({ url: '/pages/login/index' })
+  }
 })
 
 onShow(() => {

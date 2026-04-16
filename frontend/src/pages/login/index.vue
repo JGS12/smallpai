@@ -56,6 +56,7 @@ const handleSubmit = async () => {
 <template>
   <view class="login-container">
     <view class="login-bg"></view>
+    <view class="login-bg-circle"></view>
     
     <view class="form-card">
       <view class="header">
@@ -88,61 +89,100 @@ const handleSubmit = async () => {
   justify-content: center;
   position: relative;
   background-color: var(--color-bg);
+  overflow: hidden;
 }
+
+/* 增加更柔和的背景装饰 */
 .login-bg {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 40vh;
-  background: linear-gradient(to bottom, var(--color-accent), var(--color-bg));
-  border-radius: 0 0 100rpx 100rpx;
+  top: -100rpx;
+  left: -100rpx;
+  right: -100rpx;
+  height: 50vh;
+  background: radial-gradient(circle at 50% 0%, var(--color-accent) 0%, var(--color-bg) 100%);
+  border-radius: 0 0 300rpx 300rpx;
+  opacity: 0.6;
 }
+
+.login-bg-circle {
+  position: absolute;
+  bottom: -150rpx;
+  right: -100rpx;
+  width: 400rpx;
+  height: 400rpx;
+  background: var(--color-secondary);
+  border-radius: 50%;
+  opacity: 0.1;
+}
+
 .form-card {
-  width: 85%;
-  background: #FFFFFF;
-  border-radius: 40rpx;
-  padding: 60rpx 40rpx;
-  box-shadow: 0 20rpx 60rpx rgba(232, 165, 152, 0.15);
+  width: 88%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 48rpx;
+  padding: 80rpx 50rpx;
+  box-shadow: 0 30rpx 80rpx rgba(232, 165, 152, 0.2);
   z-index: 10;
+  border: 1rpx solid rgba(255, 255, 255, 0.5);
 }
+
 .header {
   text-align: center;
-  margin-bottom: 60rpx;
+  margin-bottom: 80rpx;
 }
+
 .title {
-  font-size: 44rpx;
-  font-weight: bold;
+  font-size: 52rpx;
+  font-weight: 600;
   color: var(--color-text-primary);
   display: block;
+  letter-spacing: 2rpx;
 }
+
 .subtitle {
-  font-size: 26rpx;
-  color: var(--color-text-hint);
-  margin-top: 16rpx;
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  margin-top: 20rpx;
   display: block;
+  opacity: 0.8;
 }
+
 .input-group {
-  margin-bottom: 60rpx;
+  margin-bottom: 80rpx;
 }
+
 .custom-input {
-  background-color: #F8F9FA !important;
-  margin-bottom: 30rpx;
-  padding: 20rpx 30rpx !important;
+  margin-bottom: 40rpx !important;
+  background-color: rgba(237, 224, 216, 0.2) !important;
+  border-radius: 24rpx !important;
+  padding: 10rpx 20rpx !important;
 }
+
 .btn-wrap {
-  margin-bottom: 30rpx;
+  margin-bottom: 40rpx;
 }
+
 .submit-btn {
-  height: 90rpx !important;
-  font-size: 32rpx !important;
+  height: 100rpx !important;
+  font-size: 34rpx !important;
+  font-weight: bold !important;
+  box-shadow: 0 12rpx 30rpx rgba(232, 165, 152, 0.4) !important;
+  letter-spacing: 4rpx;
 }
+
 .footer-ops {
   text-align: center;
 }
+
 .toggle-link {
-  font-size: 26rpx;
-  color: var(--color-primary);
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
   padding: 20rpx;
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.toggle-link:active {
+  color: var(--color-primary);
 }
 </style>

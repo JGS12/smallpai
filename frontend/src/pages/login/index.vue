@@ -64,9 +64,9 @@ const handleSubmit = async () => {
       </view>
 
       <view class="input-group">
-        <u--input v-model="form.username" placeholder="请输入用户名" prefixIcon="account" border="bottom" class="custom-input"></u--input>
-        <u--input v-model="form.password" type="password" placeholder="请输入密码" prefixIcon="lock" border="bottom" class="custom-input"></u--input>
-        <u--input v-if="isRegister" v-model="form.invitationCode" placeholder="请输入邀请码" prefixIcon="gift" border="bottom" class="custom-input"></u--input>
+        <u-input v-model="form.username" placeholder="请输入用户名" prefixIcon="account" border="bottom" class="custom-input"></u-input>
+        <u-input v-model="form.password" type="password" placeholder="请输入密码" prefixIcon="lock" border="bottom" class="custom-input"></u-input>
+        <u-input v-if="isRegister" v-model="form.invitationCode" placeholder="请输入邀请码" prefixIcon="gift" border="bottom" class="custom-input"></u-input>
       </view>
 
       <view class="btn-wrap">

@@ -15,6 +15,6 @@ router.use('/mother-care', motherCareRoutes.routes(), motherCareRoutes.allowedMe
 router.use('/baby-care', babyCareRoutes.routes(), babyCareRoutes.allowedMethods())
 router.use('/family-plan', familyPlanRoutes.routes(), familyPlanRoutes.allowedMethods())
 router.use('/knowledge', knowledgeRoutes.routes(), knowledgeRoutes.allowedMethods())
-router.use(authRoutes.routes(), authRoutes.allowedMethods())
+router.use('/auth', authRoutes.routes(), authRoutes.allowedMethods())
 
 module.exports = router

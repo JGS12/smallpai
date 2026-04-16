@@ -2,10 +2,10 @@
 import { onLaunch, onShow, onHide } from '@dcloudio/uni-app'
 
 onLaunch(() => {
-  const token = uni.getStorageSync('token')
-  if (!token) {
-    uni.reLaunch({ url: '/pages/login/index' })
-  }
+  // 仅在非登录页且无 token 时跳转
+  // 注意：小程序启动时无法通过 getCurrentPages 准确获取首屏路径
+  // 我们可以通过把登录页设为 pages.json 的第一个实现自然加载
+  console.log('App Launch')
 })
 
 onShow(() => {

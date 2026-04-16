@@ -64,13 +64,13 @@ const handleSubmit = async () => {
       </view>
 
       <view class="input-group">
-        <u-input v-model="form.username" placeholder="请输入用户名" prefixIcon="account" shape="circle" border="none" class="custom-input"></u-input>
-        <u-input v-model="form.password" type="password" placeholder="请输入密码" prefixIcon="lock" shape="circle" border="none" class="custom-input"></u-input>
-        <u-input v-if="isRegister" v-model="form.invitationCode" placeholder="请输入邀请码" prefixIcon="gift" shape="circle" border="none" class="custom-input"></u-input>
+        <u--input v-model="form.username" placeholder="请输入用户名" prefixIcon="account" border="bottom" class="custom-input"></u--input>
+        <u--input v-model="form.password" type="password" placeholder="请输入密码" prefixIcon="lock" border="bottom" class="custom-input"></u--input>
+        <u--input v-if="isRegister" v-model="form.invitationCode" placeholder="请输入邀请码" prefixIcon="gift" border="bottom" class="custom-input"></u--input>
       </view>
 
       <view class="btn-wrap">
-        <u-button :text="isRegister ? '立即注册' : '登录'" @click="handleSubmit" :loading="loading" shape="circle" color="var(--color-primary)" class="submit-btn"></u-button>
+        <u-button :text="isRegister ? '立即注册' : '登录'" @click="handleSubmit" :loading="loading" shape="circle" color="#E8A598" class="submit-btn"></u-button>
       </view>
 
       <view class="footer-ops">

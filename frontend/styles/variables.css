@@ -1,0 +1,32 @@
+/* ============================
+   月子小家 · 全局 CSS 变量
+   ============================ */
+
+page {
+  --color-bg: #FFFAF5;
+  --color-surface: #FFFFFF;
+  --color-primary: #E8A598;
+  --color-secondary: #C8D8C0;
+  --color-accent: #F2DFC8;
+  --color-text-primary: #3D3532;
+  --color-text-secondary: #8C7B72;
+  --color-text-hint: #B5A89F;
+  --color-border: #EDE0D8;
+
+  --radius-sm: 8rpx;
+  --radius-md: 16rpx;
+  --radius-lg: 24rpx;
+  --radius-xl: 32rpx;
+
+  --shadow-card: 0 2rpx 16rpx rgba(200, 150, 130, 0.1);
+
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-md: 24rpx;
+  --spacing-lg: 32rpx;
+  --spacing-xl: 48rpx;
+
+  background-color: var(--color-bg);
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  color: var(--color-text-primary);
+}

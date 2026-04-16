@@ -1,0 +1,102 @@
+{
+    "pages": [
+        {
+            "path": "pages/index/index",
+            "style": {
+                "navigationBarTitleText": "月子小家",
+                "navigationBarBackgroundColor": "#FFFAF5",
+                "navigationBarTextStyle": "black",
+                "backgroundColor": "#FFFAF5"
+            }
+        },
+        {
+            "path": "pages/meals/index",
+            "style": {
+                "navigationBarTitleText": "月子餐",
+                "navigationBarBackgroundColor": "#FFFAF5",
+                "navigationBarTextStyle": "black",
+                "backgroundColor": "#FFFAF5"
+            }
+        },
+        {
+            "path": "pages/mother-care/index",
+            "style": {
+                "navigationBarTitleText": "妈妈照护",
+                "navigationBarBackgroundColor": "#FFFAF5",
+                "navigationBarTextStyle": "black",
+                "backgroundColor": "#FFFAF5"
+            }
+        },
+        {
+            "path": "pages/baby-care/index",
+            "style": {
+                "navigationBarTitleText": "宝宝护理",
+                "navigationBarBackgroundColor": "#FFFAF5",
+                "navigationBarTextStyle": "black",
+                "backgroundColor": "#FFFAF5"
+            }
+        },
+        {
+            "path": "pages/family-plan/index",
+            "style": {
+                "navigationBarTitleText": "家庭安排",
+                "navigationBarBackgroundColor": "#FFFAF5",
+                "navigationBarTextStyle": "black",
+                "backgroundColor": "#FFFAF5"
+            }
+        },
+        {
+            "path": "pages/knowledge/index",
+            "style": {
+                "navigationBarTitleText": "月子知识",
+                "navigationBarBackgroundColor": "#FFFAF5",
+                "navigationBarTextStyle": "black",
+                "backgroundColor": "#FFFAF5"
+            }
+        }
+    ],
+    "tabBar": {
+        "color": "#B5A89F",
+        "selectedColor": "#E8A598",
+        "backgroundColor": "#FFFFFF",
+        "borderStyle": "white",
+        "list": [
+            {
+                "pagePath": "pages/index/index",
+                "text": "首页",
+                "iconPath": "static/icons/home.png",
+                "selectedIconPath": "static/icons/home-active.png"
+            },
+            {
+                "pagePath": "pages/meals/index",
+                "text": "月子餐",
+                "iconPath": "static/icons/meal.png",
+                "selectedIconPath": "static/icons/meal-active.png"
+            },
+            {
+                "pagePath": "pages/mother-care/index",
+                "text": "妈妈",
+                "iconPath": "static/icons/mother.png",
+                "selectedIconPath": "static/icons/mother-active.png"
+            },
+            {
+                "pagePath": "pages/baby-care/index",
+                "text": "宝宝",
+                "iconPath": "static/icons/baby.png",
+                "selectedIconPath": "static/icons/baby-active.png"
+            },
+            {
+                "pagePath": "pages/family-plan/index",
+                "text": "家庭",
+                "iconPath": "static/icons/family.png",
+                "selectedIconPath": "static/icons/family-active.png"
+            }
+        ]
+    },
+    "globalStyle": {
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "月子小家",
+        "navigationBarBackgroundColor": "#FFFAF5",
+        "backgroundColor": "#FFFAF5"
+    }
+}

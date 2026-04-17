@@ -32,16 +32,8 @@ router.get('/dashboard', adminAuth, async (ctx) => {
 
 router.get('/users', adminAuth, async (ctx) => {
   try {
-    const { page = 1, pageSize = 20 } = ctx.query
-    const offset = (parseInt(page) - 1) * parseInt(pageSize)
-
-    const [items, countResult] = await Promise.all([
-      query('SELECT id, username, role, invitation_code, created_at FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?',
-        [parseInt(pageSize), offset]),
-      query('SELECT COUNT(*) as total FROM users')
-    ])
-
-    ctx.body = success({ items, total: countResult[0].count, page: parseInt(page), pageSize: parseInt(pageSize) })
+    const items = await query('SELECT id, username, role, invitation_code, created_at FROM users ORDER BY created_at DESC')
+    ctx.body = success(items)
   } catch (err) {
     ctx.body = fail(err.message)
   }
@@ -64,20 +56,44 @@ router.put('/users/:id/role', adminAuth, async (ctx) => {
   }
 })
 
+router.delete('/users/:id', adminAuth, async (ctx) => {
+  try {
+    const { id } = ctx.params
+    await query('DELETE FROM users WHERE id = ?', [id])
+    ctx.body = success(null, '删除成功')
+  } catch (err) {
+    ctx.body = fail(err.message)
+  }
+})
+
+// ==================== 仪表盘统计 ====================
+
+router.get('/stats', adminAuth, async (ctx) => {
+  try {
+    const [userCount, mealCount, wishToday, wishPending] = await Promise.all([
+      query('SELECT COUNT(*) as count FROM users'),
+      query('SELECT COUNT(*) as count FROM meals'),
+      query('SELECT COUNT(*) as count FROM wish_meals WHERE meal_date = CURDATE()'),
+      query("SELECT COUNT(*) as count FROM wish_meals WHERE status = 'pending'")
+    ])
+
+    ctx.body = success({
+      userCount: userCount[0].count,
+      mealCount: mealCount[0].count,
+      wishToday: wishToday[0].count,
+      wishPending: wishPending[0].count
+    })
+  } catch (err) {
+    ctx.body = fail(err.message)
+  }
+})
+
 // ==================== 菜品管理 ====================
 
 router.get('/meals', adminAuth, async (ctx) => {
   try {
-    const { page = 1, pageSize = 20 } = ctx.query
-    const offset = (parseInt(page) - 1) * parseInt(pageSize)
-
-    const [items, countResult] = await Promise.all([
-      query('SELECT * FROM meals ORDER BY week ASC, meal_type ASC LIMIT ? OFFSET ?',
-        [parseInt(pageSize), offset]),
-      query('SELECT COUNT(*) as total FROM meals')
-    ])
-
-    ctx.body = success({ items, total: countResult[0].count, page: parseInt(page), pageSize: parseInt(pageSize) })
+    const items = await query('SELECT * FROM meals ORDER BY week ASC, meal_type ASC')
+    ctx.body = success(items)
   } catch (err) {
     ctx.body = fail(err.message)
   }

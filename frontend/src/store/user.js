@@ -6,7 +6,17 @@ export const useUserStore = defineStore('user', {
         token: uni.getStorageSync('token') || ''
     }),
     getters: {
-        isLogin: (state) => !!state.token
+        isLogin: (state) => !!state.token,
+        // 角色相关 getter
+        userRole: (state) => state.userInfo?.role || 'family',
+        isMom: (state) => state.userInfo?.role === 'mom',
+        isFamily: (state) => state.userInfo?.role === 'family',
+        isAdmin: (state) => state.userInfo?.role === 'admin',
+        // 权限判断
+        canOrder: (state) => state.userInfo?.role === 'mom',
+        canWish: (state) => state.userInfo?.role === 'mom',
+        canAcceptOrder: (state) => state.userInfo?.role === 'family' || state.userInfo?.role === 'admin',
+        canManage: (state) => state.userInfo?.role === 'admin'
     },
     actions: {
         setLoginInfo({ userInfo, token }) {

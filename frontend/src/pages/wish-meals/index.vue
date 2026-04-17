@@ -1,6 +1,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { request } from '@/utils/request'
+import { useUserStore } from '@/store/user'
+
+const userStore = useUserStore()
+
+// 权限判断
+const canCreateWish = computed(() => userStore.isMom)
+const canViewWish = computed(() => userStore.isMom || userStore.isFamily || userStore.isAdmin)
 
 // 当前视图：'create' 创建心愿, 'list' 我的心愿
 const currentView = ref('list')
@@ -42,6 +49,11 @@ const fetchMyWishes = async () => {
 
 // 创建心愿
 const createWish = async () => {
+  if (!canCreateWish.value) {
+    uni.showToast({ title: '只有妈妈可以许心愿哦', icon: 'none' })
+    return
+  }
+  
   if (!selectedDate.value || !selectedMealType.value) {
     uni.showToast({ title: '请选择日期和餐次', icon: 'none' })
     return
@@ -132,41 +144,53 @@ onMounted(() => {
 
 <template>
   <view class="page-container">
-    <!-- 顶部切换 -->
-    <view class="view-tabs">
-      <view 
-        class="tab-item" 
-        :class="{ active: currentView === 'list' }" 
-        @click="currentView = 'list'"
-      >
-        <text>我的心愿</text>
-      </view>
-      <view 
-        class="tab-item" 
-        :class="{ active: currentView === 'create' }" 
-        @click="currentView = 'create'"
-      >
-        <text>许个愿</text>
-      </view>
+    <!-- 权限提示 -->
+    <view v-if="!canViewWish" class="no-permission">
+      <u-empty mode="permission" text="您没有权限访问此页面"></u-empty>
     </view>
 
-    <!-- 创建心愿 -->
-    <view v-if="currentView === 'create'" class="create-section">
-      <!-- 日期选择 -->
-      <view class="form-group">
-        <text class="form-label">想吃哪天？</text>
-        <picker mode="date" :value="selectedDate" :start="today" @change="(e) => selectedDate = e.detail.value">
-          <view class="picker-display">
-            <u-icon name="calendar" color="#E8A598" size="18"></u-icon>
-            <text>{{ selectedDate }}</text>
-          </view>
-        </picker>
+    <view v-else>
+      <!-- 顶部切换（只有妈妈可以创建） -->
+      <view class="view-tabs" v-if="canCreateWish">
+        <view 
+          class="tab-item" 
+          :class="{ active: currentView === 'list' }" 
+          @click="currentView = 'list'"
+        >
+          <text>我的心愿</text>
+        </view>
+        <view 
+          class="tab-item" 
+          :class="{ active: currentView === 'create' }" 
+          @click="currentView = 'create'"
+        >
+          <text>许个愿</text>
+        </view>
       </view>
 
-      <!-- 餐次选择 -->
-      <view class="form-group">
-        <text class="form-label">哪一餐？</text>
-        <view class="meal-type-list">
+      <!-- 家人视角的标题 -->
+      <view v-if="!canCreateWish" class="family-header">
+        <text class="page-title">心愿菜单</text>
+        <text class="page-subtitle">妈妈的心愿清单</text>
+      </view>
+
+      <!-- 创建心愿（只有妈妈可见） -->
+      <view v-if="currentView === 'create' && canCreateWish" class="create-section">
+        <!-- 日期选择 -->
+        <view class="form-group">
+          <text class="form-label">想吃哪天？</text>
+          <picker mode="date" :value="selectedDate" :start="today" @change="(e) => selectedDate = e.detail.value">
+            <view class="picker-display">
+              <u-icon name="calendar" color="#E8A598" size="18"></u-icon>
+              <text>{{ selectedDate }}</text>
+            </view>
+          </picker>
+        </view>
+
+        <!-- 餐次选择 -->
+        <view class="form-group">
+          <text class="form-label">哪一餐？</text>
+          <view class="meal-type-list">
           <view 
             v-for="type in mealTypes" 
             :key="type" 
@@ -288,6 +312,32 @@ onMounted(() => {
   padding: 20rpx 0;
   background-color: var(--color-bg);
   min-height: 100vh;
+}
+
+/* 权限提示 */
+.no-permission {
+  padding: 100rpx 0;
+}
+
+/* 家人视角标题 */
+.family-header {
+  padding: 30rpx;
+  background-color: #FFFFFF;
+  margin-bottom: 20rpx;
+}
+
+.page-title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: var(--color-text-primary);
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.page-subtitle {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  display: block;
 }
 
 /* 顶部切换 */

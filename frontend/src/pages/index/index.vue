@@ -1,9 +1,21 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { request } from '@/utils/request'
+import { useUserStore } from '@/store/user'
 import SectionTitle from '@/components/common/SectionTitle.vue'
 
-const greeting = ref('早安，嘉嘉妈妈')
+const userStore = useUserStore()
+
+const greeting = computed(() => {
+  if (userStore.isMom) {
+    return `早安，${userStore.userInfo?.username || '妈妈'}`
+  } else if (userStore.isFamily) {
+    return `你好，${userStore.userInfo?.username || '家人'}`
+  } else {
+    return `欢迎，${userStore.userInfo?.username || '管理员'}`
+  }
+})
+
 const dayCount = ref(12)
 const todayMeals = ref([])
 const motherPlans = ref([])
@@ -29,16 +41,41 @@ onMounted(() => {
   fetchHomeData()
 })
 
-const quickActions = [
-  { icon: 'calendar', title: '周餐单', path: '/pages/meals/index', color: '#E8A598' },
-  { icon: 'heart', title: '心愿菜单', path: '/pages/wish-meals/index', color: '#F2A5A5' },
-  { icon: 'shopping-cart', title: '点餐台', path: '/pages/orders/index', color: '#C8D8C0' },
-  { icon: 'edit-pen', title: '生活记录', path: '/pages/life-records/index', color: '#F2DFC8' },
-  { icon: 'baby', title: '成长日记', path: '/pages/baby-diary/index', color: '#98B8E8' },
-  { icon: 'chat', title: '家人互动', path: '/pages/social/index', color: '#E8A598' },
-  { icon: 'file-text', title: '本周小报', path: '/pages/weekly-report/index', color: '#C8D8C0' },
-  { icon: 'info-circle', title: '月子百科', path: '/pages/knowledge/index', color: '#F2DFC8' }
-]
+// 根据角色显示不同的快捷功能
+const quickActions = computed(() => {
+  const baseActions = [
+    { icon: 'calendar', title: '周餐单', path: '/pages/meals/index', color: '#E8A598', roles: ['mom', 'family', 'admin'] },
+    { icon: 'edit-pen', title: '生活记录', path: '/pages/life-records/index', color: '#F2DFC8', roles: ['mom', 'family', 'admin'] },
+    { icon: 'baby', title: '成长日记', path: '/pages/baby-diary/index', color: '#98B8E8', roles: ['mom', 'family', 'admin'] },
+    { icon: 'chat', title: '家人互动', path: '/pages/social/index', color: '#E8A598', roles: ['mom', 'family', 'admin'] },
+    { icon: 'file-text', title: '本周小报', path: '/pages/weekly-report/index', color: '#C8D8C0', roles: ['mom', 'family', 'admin'] },
+    { icon: 'info-circle', title: '月子百科', path: '/pages/knowledge/index', color: '#F2DFC8', roles: ['mom', 'family', 'admin'] }
+  ]
+
+  // 妈妈特有功能
+  const momActions = [
+    { icon: 'heart', title: '心愿菜单', path: '/pages/wish-meals/index', color: '#F2A5A5', roles: ['mom'] },
+    { icon: 'shopping-cart', title: '点餐台', path: '/pages/orders/index', color: '#C8D8C0', roles: ['mom'] }
+  ]
+
+  // 家人特有功能
+  const familyActions = [
+    { icon: 'list', title: '接单中心', path: '/pages/orders/index', color: '#C8D8C0', roles: ['family', 'admin'] }
+  ]
+
+  const userRole = userStore.userRole
+  
+  // 合并角色对应的功能
+  let actions = [...baseActions.filter(action => action.roles.includes(userRole))]
+  
+  if (userRole === 'mom') {
+    actions = [...momActions, ...actions]
+  } else if (userRole === 'family' || userRole === 'admin') {
+    actions = [...familyActions, ...actions]
+  }
+  
+  return actions
+})
 
 const navTo = (url) => {
   // 检查是否是 tabBar 页面

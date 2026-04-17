@@ -10,11 +10,25 @@ const loading = ref(false)
 const form = ref({
   username: '',
   password: '',
-  invitationCode: ''
+  invitationCode: '',
+  role: 'family' // 默认角色为家人
 })
+
+// 角色选项
+const roleOptions = [
+  { value: 'mom', label: '孕妇/妈妈', icon: '🤰', desc: '可以点餐、发心愿、记录生活' },
+  { value: 'family', label: '家人', icon: '👨‍👩‍👧', desc: '查看信息、接单做饭、留言互动' }
+]
+
+const selectedRole = ref('family')
 
 const toggleMode = () => {
   isRegister.value = !isRegister.value
+}
+
+const selectRole = (role) => {
+  selectedRole.value = role
+  form.value.role = role
 }
 
 const handleSubmit = async () => {
@@ -69,6 +83,24 @@ const handleSubmit = async () => {
         <u-input v-model="form.username" placeholder="请输入用户名" prefixIcon="account" border="bottom" class="custom-input"></u-input>
         <u-input v-model="form.password" type="password" placeholder="请输入密码" prefixIcon="lock" border="bottom" class="custom-input"></u-input>
         <u-input v-if="isRegister" v-model="form.invitationCode" placeholder="请输入邀请码" prefixIcon="gift" border="bottom" class="custom-input"></u-input>
+        
+        <!-- 角色选择（仅注册时显示） -->
+        <view v-if="isRegister" class="role-selection">
+          <text class="role-title">选择你的角色</text>
+          <view class="role-options">
+            <view 
+              v-for="option in roleOptions" 
+              :key="option.value"
+              class="role-option"
+              :class="{ active: selectedRole === option.value }"
+              @click="selectRole(option.value)"
+            >
+              <text class="role-icon">{{ option.icon }}</text>
+              <text class="role-label">{{ option.label }}</text>
+              <text class="role-desc">{{ option.desc }}</text>
+            </view>
+          </view>
+        </view>
       </view>
 
       <view class="btn-wrap">
@@ -157,6 +189,70 @@ const handleSubmit = async () => {
   background-color: rgba(237, 224, 216, 0.2) !important;
   border-radius: 24rpx !important;
   padding: 10rpx 20rpx !important;
+}
+
+/* 角色选择样式 */
+.role-selection {
+  margin-bottom: 40rpx;
+}
+
+.role-title {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  margin-bottom: 20rpx;
+  display: block;
+  text-align: center;
+}
+
+.role-options {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.role-option {
+  background-color: rgba(237, 224, 216, 0.2);
+  border-radius: 24rpx;
+  padding: 30rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.3s ease;
+}
+
+.role-option.active {
+  background-color: rgba(232, 165, 152, 0.1);
+  border-color: var(--color-primary);
+}
+
+.role-icon {
+  font-size: 48rpx;
+  display: block;
+  text-align: center;
+  margin-bottom: 10rpx;
+}
+
+.role-label {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: block;
+  text-align: center;
+  margin-bottom: 8rpx;
+}
+
+.role-desc {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  display: block;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.role-option.active .role-label {
+  color: var(--color-primary);
+}
+
+.role-option.active .role-desc {
+  color: var(--color-text-primary);
 }
 
 .btn-wrap {

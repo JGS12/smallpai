@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'paipai-mini-secret-key'
 /**
  * 用户注册
  */
-const register = async ({ username, password, invitationCode }) => {
+const register = async ({ username, password, invitationCode, role = 'family' }) => {
     if (!username || !password) {
         throw new Error('用户名和密码不能为空')
     }
@@ -20,6 +20,12 @@ const register = async ({ username, password, invitationCode }) => {
 
     if (password.length < 6) {
         throw new Error('密码长度不能少于6位')
+    }
+
+    // 验证角色
+    const validRoles = ['mom', 'family', 'admin']
+    if (!validRoles.includes(role)) {
+        throw new Error('无效的角色类型')
     }
 
     // 检查用户名是否已存在
@@ -35,7 +41,7 @@ const register = async ({ username, password, invitationCode }) => {
     // 插入用户
     const result = await query(
         'INSERT INTO users (username, password, role, invitation_code, created_at) VALUES (?, ?, ?, ?, NOW())',
-        [username, hashedPassword, 'member', invitationCode || null]
+        [username, hashedPassword, role, invitationCode || null]
     )
 
     // 生成 JWT token
@@ -48,7 +54,7 @@ const register = async ({ username, password, invitationCode }) => {
     return {
         id: result.insertId,
         username,
-        role: 'member',
+        role,
         token
     }
 }

@@ -1,6 +1,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { request } from '@/utils/request'
+import { useUserStore } from '@/store/user'
+
+const userStore = useUserStore()
+
+// 权限判断
+const canOrder = computed(() => userStore.isMom)
+const canAcceptOrder = computed(() => userStore.isFamily || userStore.isAdmin)
 
 const today = new Date().toISOString().split('T')[0]
 const selectedDate = ref(today)
@@ -49,6 +56,11 @@ const groupedOrders = computed(() => {
 
 // 点餐
 const submitOrder = async () => {
+  if (!canOrder.value) {
+    uni.showToast({ title: '只有妈妈可以点餐哦', icon: 'none' })
+    return
+  }
+  
   if (!selectedMeal.value && !customName.value) {
     uni.showToast({ title: '请选择菜品或输入自定义菜品', icon: 'none' })
     return
@@ -82,6 +94,11 @@ const submitOrder = async () => {
 
 // 接单
 const acceptOrder = async (id) => {
+  if (!canAcceptOrder.value) {
+    uni.showToast({ title: '只有家人可以接单哦', icon: 'none' })
+    return
+  }
+  
   try {
     await request({ url: `/orders/${id}/accept`, method: 'PUT' })
     uni.showToast({ title: '接单成功！', icon: 'success' })
@@ -136,6 +153,12 @@ onMounted(() => {
 
 <template>
   <view class="page-container">
+    <!-- 页面标题 -->
+    <view class="page-header">
+      <text class="page-title">{{ canOrder ? '点餐台' : '接单中心' }}</text>
+      <text class="page-subtitle">{{ canOrder ? '想吃什么，点什么' : '看看妈妈想吃什么' }}</text>
+    </view>
+
     <!-- 日期选择 -->
     <view class="date-bar">
       <text class="date-label">📅 {{ selectedDate }}</text>
@@ -146,14 +169,15 @@ onMounted(() => {
       <view v-for="type in mealTypes" :key="type" class="meal-section">
         <view class="section-header">
           <text class="section-title">{{ type }}</text>
-          <view class="add-btn" @click="selectedType = type; showOrderForm = true">
+          <!-- 只有妈妈可以点餐 -->
+          <view v-if="canOrder" class="add-btn" @click="selectedType = type; showOrderForm = true">
             <u-icon name="plus" color="#E8A598" size="16"></u-icon>
             <text>点餐</text>
           </view>
         </view>
 
         <view v-if="groupedOrders[type].length === 0" class="empty-tip">
-          <text>暂无点餐，点击上方 + 点餐</text>
+          <text>{{ canOrder ? '暂无点餐，点击上方 + 点餐' : '暂无点餐' }}</text>
         </view>
 
         <view v-for="order in groupedOrders[type]" :key="order.id" class="order-card">
@@ -168,13 +192,15 @@ onMounted(() => {
             </view>
           </view>
           <view class="order-actions">
-            <view v-if="order.status === 'pending'" class="action-btn accept" @click="acceptOrder(order.id)">
+            <!-- 只有家人可以接单 -->
+            <view v-if="order.status === 'pending' && canAcceptOrder" class="action-btn accept" @click="acceptOrder(order.id)">
               接单
             </view>
             <view v-if="order.status === 'accepted'" class="action-btn done" @click="completeOrder(order.id)">
               完成
             </view>
-            <view v-if="order.status === 'pending'" class="action-btn cancel" @click="cancelOrder(order.id)">
+            <!-- 妈妈可以取消自己的订单 -->
+            <view v-if="order.status === 'pending' && canOrder" class="action-btn cancel" @click="cancelOrder(order.id)">
               取消
             </view>
           </view>
@@ -229,6 +255,25 @@ onMounted(() => {
   padding: 30rpx;
   background-color: var(--color-bg);
   min-height: 100vh;
+}
+
+/* 页面标题 */
+.page-header {
+  margin-bottom: 30rpx;
+}
+
+.page-title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: var(--color-text-primary);
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.page-subtitle {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  display: block;
 }
 
 .date-bar {

@@ -7,6 +7,7 @@ const greeting = ref('早安，嘉嘉妈妈')
 const dayCount = ref(12)
 const todayMeals = ref([])
 const motherPlans = ref([])
+const todayWishes = ref([])
 
 const fetchHomeData = async () => {
   try {
@@ -15,6 +16,10 @@ const fetchHomeData = async () => {
     
     const plans = await request({ url: '/mother-care' })
     motherPlans.value = plans.slice(0, 2)
+
+    // 获取今日心愿
+    const wishes = await request({ url: '/wish-meals/today' })
+    todayWishes.value = wishes
   } catch (e) {
     console.error(e)
   }
@@ -26,13 +31,19 @@ onMounted(() => {
 
 const quickActions = [
   { icon: 'calendar', title: '周餐单', path: '/pages/meals/index', color: '#E8A598' },
+  { icon: 'heart', title: '心愿菜单', path: '/pages/wish-meals/index', color: '#F2A5A5' },
   { icon: 'shopping-cart', title: '备物清单', path: '/pages/knowledge/index', color: '#C8D8C0' },
-  { icon: 'edit-pen', title: '成长记录', path: '/pages/baby-care/index', color: '#F2DFC8' },
-  { icon: 'chat', title: '专家咨询', path: '/pages/knowledge/index', color: '#B5A89F' }
+  { icon: 'edit-pen', title: '成长记录', path: '/pages/baby-care/index', color: '#F2DFC8' }
 ]
 
 const navTo = (url) => {
-  uni.switchTab({ url })
+  // 检查是否是 tabBar 页面
+  const tabBarPages = ['/pages/index/index', '/pages/meals/index', '/pages/mother-care/index', '/pages/baby-care/index']
+  if (tabBarPages.includes(url)) {
+    uni.switchTab({ url })
+  } else {
+    uni.navigateTo({ url })
+  }
 }
 </script>
 
@@ -84,6 +95,32 @@ const navTo = (url) => {
           </view>
         </view>
       </view>
+    </view>
+
+    <!-- 今日心愿 -->
+    <view class="content-section" v-if="todayWishes.length > 0">
+      <SectionTitle title="今日心愿" sub-title="你想吃的 · 都在这里" />
+      <view class="wish-list">
+        <view v-for="wish in todayWishes" :key="wish.id" class="wish-item">
+          <u-tag 
+            :text="wish.meal_type" 
+            plain 
+            size="mini" 
+            type="primary" 
+            color="#E8A598" 
+            borderColor="#E8A598"
+          ></u-tag>
+          <text class="wish-name">{{ wish.meal_name || wish.custom_name }}</text>
+          <text v-if="wish.remark" class="wish-remark">{{ wish.remark }}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 查看更多心愿 -->
+    <view class="more-wishes" @click="navTo('/pages/wish-meals/index')">
+      <u-icon name="heart" color="#E8A598" size="16"></u-icon>
+      <text>查看所有心愿</text>
+      <u-icon name="arrow-right" color="#B5A89F" size="14"></u-icon>
     </view>
   </view>
 </template>
@@ -219,5 +256,47 @@ const navTo = (url) => {
   border-radius: 4rpx;
   margin-right: 10rpx;
   margin-bottom: 10rpx;
+}
+
+/* 今日心愿 */
+.wish-list {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 10rpx 30rpx;
+  box-shadow: var(--shadow-card);
+}
+
+.wish-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 20rpx 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.wish-item:last-child {
+  border-bottom: none;
+}
+
+.wish-name {
+  font-size: 28rpx;
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.wish-remark {
+  font-size: 22rpx;
+  color: var(--color-text-hint);
+}
+
+.more-wishes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 24rpx;
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
 }
 </style>

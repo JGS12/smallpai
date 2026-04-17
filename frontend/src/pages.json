@@ -49,6 +49,12 @@
             "style": {
                 "navigationBarTitleText": "家庭分工"
             }
+        },
+        {
+            "path": "pages/wish-meals/index",
+            "style": {
+                "navigationBarTitleText": "心愿菜单"
+            }
         }
     ],
     "globalStyle": {

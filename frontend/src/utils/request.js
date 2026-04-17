@@ -29,9 +29,12 @@ export const request = (options) => {
                     uni.reLaunch({ url: '/pages/login/index' })
                     reject(res.data)
                 } else {
+                    // 显示错误信息
+                    const errorMsg = res.data.message || '请求失败'
                     uni.showToast({
-                        title: res.data.message || '请求失败',
-                        icon: 'none'
+                        title: errorMsg,
+                        icon: 'none',
+                        duration: 2000
                     })
                     reject(res.data)
                 }

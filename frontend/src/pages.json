@@ -55,6 +55,36 @@
             "style": {
                 "navigationBarTitleText": "心愿菜单"
             }
+        },
+        {
+            "path": "pages/orders/index",
+            "style": {
+                "navigationBarTitleText": "点餐台"
+            }
+        },
+        {
+            "path": "pages/life-records/index",
+            "style": {
+                "navigationBarTitleText": "生活记录"
+            }
+        },
+        {
+            "path": "pages/baby-diary/index",
+            "style": {
+                "navigationBarTitleText": "成长日记"
+            }
+        },
+        {
+            "path": "pages/social/index",
+            "style": {
+                "navigationBarTitleText": "家人互动"
+            }
+        },
+        {
+            "path": "pages/weekly-report/index",
+            "style": {
+                "navigationBarTitleText": "本周小报"
+            }
         }
     ],
     "globalStyle": {

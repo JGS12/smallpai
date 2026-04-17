@@ -32,8 +32,12 @@ onMounted(() => {
 const quickActions = [
   { icon: 'calendar', title: '周餐单', path: '/pages/meals/index', color: '#E8A598' },
   { icon: 'heart', title: '心愿菜单', path: '/pages/wish-meals/index', color: '#F2A5A5' },
-  { icon: 'shopping-cart', title: '备物清单', path: '/pages/knowledge/index', color: '#C8D8C0' },
-  { icon: 'edit-pen', title: '成长记录', path: '/pages/baby-care/index', color: '#F2DFC8' }
+  { icon: 'shopping-cart', title: '点餐台', path: '/pages/orders/index', color: '#C8D8C0' },
+  { icon: 'edit-pen', title: '生活记录', path: '/pages/life-records/index', color: '#F2DFC8' },
+  { icon: 'baby', title: '成长日记', path: '/pages/baby-diary/index', color: '#98B8E8' },
+  { icon: 'chat', title: '家人互动', path: '/pages/social/index', color: '#E8A598' },
+  { icon: 'file-text', title: '本周小报', path: '/pages/weekly-report/index', color: '#C8D8C0' },
+  { icon: 'info-circle', title: '月子百科', path: '/pages/knowledge/index', color: '#F2DFC8' }
 ]
 
 const navTo = (url) => {
@@ -165,6 +169,7 @@ const navTo = (url) => {
   grid-template-columns: repeat(4, 1fr);
   gap: 20rpx;
   margin-bottom: 50rpx;
+  row-gap: 30rpx;
 }
 .action-item {
   display: flex;

@@ -1,5 +1,5 @@
 // 请求封装
-const BASE_URL = 'http://111.231.44.183:3000/api'
+const BASE_URL = 'https://smallpai.live/api'
 
 /**
  * 统一请求方法

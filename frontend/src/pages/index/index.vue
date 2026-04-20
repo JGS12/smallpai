@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { request } from '@/utils/request'
+import { getMeals, getMotherCare, getTodayWishes } from '@/api'
 import { useUserStore } from '@/store/user'
 import SectionTitle from '@/components/common/SectionTitle.vue'
 
@@ -23,14 +23,14 @@ const todayWishes = ref([])
 
 const fetchHomeData = async () => {
   try {
-    const meals = await request({ url: '/meals?week=2&mealType=早餐' })
+    const meals = await getMeals({ week: 2, mealType: '早餐' })
     todayMeals.value = meals.slice(0, 1)
     
-    const plans = await request({ url: '/mother-care' })
+    const plans = await getMotherCare()
     motherPlans.value = plans.slice(0, 2)
 
     // 获取今日心愿
-    const wishes = await request({ url: '/wish-meals/today' })
+    const wishes = await getTodayWishes()
     todayWishes.value = wishes
   } catch (e) {
     console.error(e)

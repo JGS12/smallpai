@@ -1,12 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { request } from '@/utils/request'
+import { getKnowledge } from '@/api'
 
 const knowledgeList = ref([])
 
 const fetchKnowledge = async () => {
   try {
-    const res = await request({ url: '/knowledge' })
+    const res = await getKnowledge()
     knowledgeList.value = res
   } catch (e) {
     console.error(e)

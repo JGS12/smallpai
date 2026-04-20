@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { request } from '@/utils/request'
+import { getMeals, getOrders, createOrder, acceptOrder, completeOrder, cancelOrder } from '@/api'
 import { useUserStore } from '@/store/user'
 
 const userStore = useUserStore()
@@ -25,7 +25,7 @@ const remark = ref('')
 // 加载今日点餐
 const fetchOrders = async () => {
   try {
-    const res = await request({ url: `/orders?date=${selectedDate.value}` })
+    const res = await getOrders(selectedDate.value)
     orders.value = res.items || []
   } catch (e) {
     console.error(e)
@@ -35,7 +35,7 @@ const fetchOrders = async () => {
 // 加载菜单
 const fetchMeals = async () => {
   try {
-    const res = await request({ url: '/meals' })
+    const res = await getMeals()
     meals.value = res || []
   } catch (e) {
     console.error(e)
@@ -70,16 +70,12 @@ const submitOrder = async () => {
     return
   }
   try {
-    await request({
-      url: '/orders',
-      method: 'POST',
-      data: {
-        mealId: selectedMeal.value?.id || null,
-        customName: customName.value || null,
-        mealDate: selectedDate.value,
-        mealType: selectedType.value,
-        remark: remark.value
-      }
+    await createOrder({
+      mealId: selectedMeal.value?.id || null,
+      customName: customName.value || null,
+      mealDate: selectedDate.value,
+      mealType: selectedType.value,
+      remark: remark.value
     })
     uni.showToast({ title: '点餐成功！', icon: 'success' })
     showOrderForm.value = false
@@ -93,14 +89,14 @@ const submitOrder = async () => {
 }
 
 // 接单
-const acceptOrder = async (id) => {
+const handleAcceptOrder = async (id) => {
   if (!canAcceptOrder.value) {
     uni.showToast({ title: '只有家人可以接单哦', icon: 'none' })
     return
   }
   
   try {
-    await request({ url: `/orders/${id}/accept`, method: 'PUT' })
+    await acceptOrder(id)
     uni.showToast({ title: '接单成功！', icon: 'success' })
     fetchOrders()
   } catch (e) {
@@ -109,9 +105,9 @@ const acceptOrder = async (id) => {
 }
 
 // 完成
-const completeOrder = async (id) => {
+const handleCompleteOrder = async (id) => {
   try {
-    await request({ url: `/orders/${id}/complete`, method: 'PUT' })
+    await completeOrder(id)
     uni.showToast({ title: '已完成！', icon: 'success' })
     fetchOrders()
   } catch (e) {
@@ -120,14 +116,14 @@ const completeOrder = async (id) => {
 }
 
 // 取消
-const cancelOrder = async (id) => {
+const handleCancelOrder = async (id) => {
   uni.showModal({
     title: '提示',
     content: '确定取消这个点餐吗？',
     success: async (res) => {
       if (res.confirm) {
         try {
-          await request({ url: `/orders/${id}`, method: 'DELETE' })
+          await cancelOrder(id)
           uni.showToast({ title: '已取消', icon: 'success' })
           fetchOrders()
         } catch (e) {
@@ -193,14 +189,14 @@ onMounted(() => {
           </view>
           <view class="order-actions">
             <!-- 只有家人可以接单 -->
-            <view v-if="order.status === 'pending' && canAcceptOrder" class="action-btn accept" @click="acceptOrder(order.id)">
+            <view v-if="order.status === 'pending' && canAcceptOrder" class="action-btn accept" @click="handleAcceptOrder(order.id)">
               接单
             </view>
-            <view v-if="order.status === 'accepted'" class="action-btn done" @click="completeOrder(order.id)">
+            <view v-if="order.status === 'accepted'" class="action-btn done" @click="handleCompleteOrder(order.id)">
               完成
             </view>
             <!-- 妈妈可以取消自己的订单 -->
-            <view v-if="order.status === 'pending' && canOrder" class="action-btn cancel" @click="cancelOrder(order.id)">
+            <view v-if="order.status === 'pending' && canOrder" class="action-btn cancel" @click="handleCancelOrder(order.id)">
               取消
             </view>
           </view>

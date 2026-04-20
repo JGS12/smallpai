@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { request } from '@/utils/request'
+import { getMilestones, createMilestone, getPhotos, uploadPhoto, getDiaries, createDiary } from '@/api'
 
 const activeTab = ref('milestones')
 const tabs = [
@@ -22,7 +22,7 @@ const iconOptions = ['⭐', '👶', '🍼', '😴', '😊', '🦶', '👋', '�
 
 const fetchMilestones = async () => {
   try {
-    const res = await request({ url: '/baby-diary/milestones' })
+    const res = await getMilestones()
     milestones.value = res.items || []
   } catch (e) { console.error(e) }
 }
@@ -33,7 +33,7 @@ const submitMilestone = async () => {
     return
   }
   try {
-    await request({ url: '/baby-diary/milestones', method: 'POST', data: milestoneForm.value })
+    await createMilestone(milestoneForm.value)
     uni.showToast({ title: '记录成功！', icon: 'success' })
     showMilestoneForm.value = false
     milestoneForm.value = { title: '', content: '', milestoneDate: new Date().toISOString().split('T')[0], icon: '⭐' }
@@ -52,7 +52,7 @@ const photoForm = ref({
 
 const fetchPhotos = async () => {
   try {
-    const res = await request({ url: '/baby-diary/photos' })
+    const res = await getPhotos()
     photos.value = res.items || []
   } catch (e) { console.error(e) }
 }
@@ -73,7 +73,7 @@ const submitPhoto = async () => {
   }
   // 简化：直接用本地路径（实际项目需要上传到服务器）
   try {
-    await request({ url: '/baby-diary/photos', method: 'POST', data: photoForm.value })
+    await uploadPhoto(photoForm.value)
     uni.showToast({ title: '添加成功！', icon: 'success' })
     showPhotoForm.value = false
     photoForm.value = { photoUrl: '', caption: '', photoDate: new Date().toISOString().split('T')[0] }
@@ -93,7 +93,7 @@ const diaryForm = ref({
 
 const fetchDiaries = async () => {
   try {
-    const res = await request({ url: '/baby-diary/diaries' })
+    const res = await getDiaries()
     diaries.value = res.items || []
   } catch (e) { console.error(e) }
 }
@@ -104,7 +104,7 @@ const submitDiary = async () => {
     return
   }
   try {
-    await request({ url: '/baby-diary/diaries', method: 'POST', data: diaryForm.value })
+    await createDiary(diaryForm.value)
     uni.showToast({ title: '保存成功！', icon: 'success' })
     showDiaryForm.value = false
     diaryForm.value = { title: '', content: '', mood: '', entryDate: new Date().toISOString().split('T')[0] }

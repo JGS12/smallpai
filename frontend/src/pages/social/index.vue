@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { request } from '@/utils/request'
+import { getMessages, sendMessage, getAchievements, getLeaderboard, getLetters, sendLetter } from '@/api'
 
 const activeTab = ref('messages')
 const tabs = [
@@ -21,18 +21,18 @@ const fetchMessages = async (reset = false) => {
       msgPage.value = 1
       messages.value = []
     }
-    const res = await request({ url: `/social/messages?page=${msgPage.value}&pageSize=20` })
+    const res = await getMessages(msgPage.value, 20)
     messages.value = reset ? (res.items || []) : [...messages.value, ...(res.items || [])]
   } catch (e) { console.error(e) }
 }
 
-const sendMessage = async () => {
+const handleSendMessage = async () => {
   if (!newMessage.value.trim()) {
     uni.showToast({ title: '请输入留言内容', icon: 'none' })
     return
   }
   try {
-    await request({ url: '/social/messages', method: 'POST', data: { content: newMessage.value } })
+    await sendMessage(newMessage.value)
     newMessage.value = ''
     uni.showToast({ title: '留言成功！', icon: 'success' })
     fetchMessages(true)
@@ -48,7 +48,7 @@ const loadMoreMessages = () => {
 const achievements = ref([])
 const fetchAchievements = async () => {
   try {
-    const res = await request({ url: '/social/achievements' })
+    const res = await getAchievements()
     achievements.value = res.items || []
   } catch (e) { console.error(e) }
 }
@@ -57,7 +57,7 @@ const fetchAchievements = async () => {
 const leaderboard = ref({ cooks: [], messagers: [], feeders: [] })
 const fetchLeaderboard = async () => {
   try {
-    const res = await request({ url: '/social/leaderboard' })
+    const res = await getLeaderboard()
     leaderboard.value = res || { cooks: [], messagers: [], feeders: [] }
   } catch (e) { console.error(e) }
 }
@@ -73,7 +73,7 @@ const letterForm = ref({
 
 const fetchLetters = async () => {
   try {
-    const res = await request({ url: '/social/letters' })
+    const res = await getLetters()
     letters.value = res.items || []
   } catch (e) { console.error(e) }
 }
@@ -84,7 +84,7 @@ const submitLetter = async () => {
     return
   }
   try {
-    await request({ url: '/social/letters', method: 'POST', data: letterForm.value })
+    await sendLetter(letterForm.value)
     uni.showToast({ title: '信件已保存！', icon: 'success' })
     showLetterForm.value = false
     letterForm.value = { title: '', content: '', unlockDate: '' }
@@ -120,7 +120,7 @@ onMounted(() => {
       <!-- 发送框 -->
       <view class="send-box">
         <u-input v-model="newMessage" placeholder="给妈妈说句暖心的话..." :customStyle="{ flex: 1 }" />
-        <view class="send-btn" @click="sendMessage">发送</view>
+        <view class="send-btn" @click="handleSendMessage">发送</view>
       </view>
 
       <!-- 消息列表 -->

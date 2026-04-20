@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useUserStore } from '@/store/user'
-import { request } from '@/utils/request'
+import { login, register } from '@/api'
 
 const userStore = useUserStore()
 const isRegister = ref(false)
@@ -41,12 +41,10 @@ const handleSubmit = async () => {
 
   loading.value = true
   try {
-    const url = isRegister.value ? '/auth/register' : '/auth/login'
-    const res = await request({
-      url,
-      method: 'POST',
-      data: form.value
-    })
+    // 根据模式调用登录或注册接口
+    const res = isRegister.value 
+      ? await register(form.value)
+      : await login(form.value)
     
     // 登录或注册成功后处理，res 即后端返回的 data: { id, username, role, token }
     const { token, ...userInfo } = res

@@ -1,6 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { request } from '@/utils/request'
+import { 
+  getFeedingRecords, createFeedingRecord,
+  getSleepRecords, createSleepRecord,
+  getMoodRecords, createMoodRecord,
+  getWeightRecords, createWeightRecord,
+  getLifeStats
+} from '@/api'
 
 const today = new Date().toISOString().split('T')[0]
 const activeTab = ref('feeding')
@@ -25,19 +31,19 @@ const sides = ['左边', '右边', '双边']
 
 const fetchFeedings = async () => {
   try {
-    const res = await request({ url: `/life-records/feeding?date=${today}` })
+    const res = await getFeedingRecords(today)
     feedings.value = res.items || []
   } catch (e) { console.error(e) }
 }
 
 const submitFeeding = async () => {
   try {
-    await request({ url: '/life-records/feeding', method: 'POST', data: {
+    await createFeedingRecord({
       feedTime: feedForm.value.feedTime,
       duration: feedForm.value.duration || null,
       side: feedForm.value.side === '左边' ? 'left' : feedForm.value.side === '右边' ? 'right' : 'both',
       note: feedForm.value.note
-    }})
+    })
     uni.showToast({ title: '记录成功', icon: 'success' })
     showFeedForm.value = false
     fetchFeedings()
@@ -61,19 +67,19 @@ const qualities = [
 
 const fetchSleep = async () => {
   try {
-    const res = await request({ url: `/life-records/sleep?date=${today}` })
+    const res = await getSleepRecords(today)
     sleepRecords.value = res.items || []
   } catch (e) { console.error(e) }
 }
 
 const submitSleep = async () => {
   try {
-    await request({ url: '/life-records/sleep', method: 'POST', data: {
+    await createSleepRecord({
       sleepStart: sleepForm.value.sleepStart,
       sleepEnd: sleepForm.value.sleepEnd || null,
       quality: sleepForm.value.quality || null,
       note: sleepForm.value.note
-    }})
+    })
     uni.showToast({ title: '记录成功', icon: 'success' })
     showSleepForm.value = false
     fetchSleep()
@@ -93,7 +99,7 @@ const moodOptions = [
 
 const fetchMoods = async () => {
   try {
-    const res = await request({ url: `/life-records/mood?startDate=${today}&endDate=${today}` })
+    const res = await getMoodRecords(today, today)
     moods.value = res.items || []
     if (moods.value.length > 0) {
       todayMood.value = moods.value[0].mood
@@ -105,11 +111,11 @@ const fetchMoods = async () => {
 const submitMood = async (mood) => {
   todayMood.value = mood
   try {
-    await request({ url: '/life-records/mood', method: 'POST', data: {
+    await createMoodRecord({
       mood,
       note: moodNote.value,
       recordDate: today
-    }})
+    })
     uni.showToast({ title: '打卡成功！', icon: 'success' })
   } catch (e) { console.error(e) }
 }
@@ -122,7 +128,7 @@ const weightDate = ref(today)
 
 const fetchWeights = async () => {
   try {
-    const res = await request({ url: '/life-records/weight?limit=30' })
+    const res = await getWeightRecords(30)
     weights.value = res.items || []
   } catch (e) { console.error(e) }
 }
@@ -133,10 +139,10 @@ const submitWeight = async () => {
     return
   }
   try {
-    await request({ url: '/life-records/weight', method: 'POST', data: {
+    await createWeightRecord({
       weight: parseFloat(newWeight.value),
       recordDate: weightDate.value
-    }})
+    })
     uni.showToast({ title: '记录成功', icon: 'success' })
     showWeightForm.value = false
     newWeight.value = ''
@@ -148,7 +154,7 @@ const submitWeight = async () => {
 const stats = ref(null)
 const fetchStats = async () => {
   try {
-    const res = await request({ url: '/life-records/stats?days=7' })
+    const res = await getLifeStats(7)
     stats.value = res
   } catch (e) { console.error(e) }
 }

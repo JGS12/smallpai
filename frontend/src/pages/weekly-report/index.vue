@@ -1,20 +1,20 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { request } from '@/utils/request'
+import { getWeeklyReport, getWeeklyReports } from '@/api'
 
 const currentReport = ref(null)
 const recentReports = ref([])
 
 const fetchCurrentReport = async () => {
   try {
-    const res = await request({ url: '/social/weekly-report' })
+    const res = await getWeeklyReport()
     currentReport.value = res
   } catch (e) { console.error(e) }
 }
 
 const fetchRecentReports = async () => {
   try {
-    const res = await request({ url: '/social/weekly-reports' })
+    const res = await getWeeklyReports()
     recentReports.value = res.items || []
   } catch (e) { console.error(e) }
 }

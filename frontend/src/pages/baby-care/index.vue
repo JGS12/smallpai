@@ -1,12 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { request } from '@/utils/request'
+import { getBabyCare } from '@/api'
 
 const babyCareData = ref(null)
 
 const fetchBabyCare = async () => {
   try {
-    const res = await request({ url: '/baby-care' })
+    const res = await getBabyCare()
     babyCareData.value = res
   } catch (e) {
     console.error(e)

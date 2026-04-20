@@ -1,12 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { request } from '@/utils/request'
+import { getFamilyPlan } from '@/api'
 
 const planData = ref(null)
 
 const fetchPlan = async () => {
   try {
-    const res = await request({ url: '/family-plan' })
+    const res = await getFamilyPlan()
     planData.value = res
   } catch (e) {
     console.error(e)

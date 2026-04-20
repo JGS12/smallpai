@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { request } from '@/utils/request'
+import { getMeals, getMyWishes, createWish, updateWishStatus } from '@/api'
 import { useUserStore } from '@/store/user'
 
 const userStore = useUserStore()
@@ -30,7 +30,7 @@ const myWishes = ref([])
 // 获取菜品列表
 const fetchMeals = async () => {
   try {
-    const res = await request({ url: '/meals' })
+    const res = await getMeals()
     mealList.value = res
   } catch (e) {
     console.error(e)
@@ -40,7 +40,7 @@ const fetchMeals = async () => {
 // 获取我的心愿
 const fetchMyWishes = async () => {
   try {
-    const res = await request({ url: '/wish-meals/my' })
+    const res = await getMyWishes()
     myWishes.value = res
   } catch (e) {
     console.error(e)
@@ -48,7 +48,7 @@ const fetchMyWishes = async () => {
 }
 
 // 创建心愿
-const createWish = async () => {
+const handleCreateWish = async () => {
   if (!canCreateWish.value) {
     uni.showToast({ title: '只有妈妈可以许心愿哦', icon: 'none' })
     return
@@ -64,16 +64,12 @@ const createWish = async () => {
   }
 
   try {
-    await request({
-      url: '/wish-meals',
-      method: 'POST',
-      data: {
-        mealId: selectedMeal.value?.id || null,
-        mealDate: selectedDate.value,
-        mealType: selectedMealType.value,
-        customName: customName.value.trim() || null,
-        remark: remark.value.trim() || null
-      }
+    await createWish({
+      mealId: selectedMeal.value?.id || null,
+      mealDate: selectedDate.value,
+      mealType: selectedMealType.value,
+      customName: customName.value.trim() || null,
+      remark: remark.value.trim() || null
     })
     uni.showToast({ title: '许愿成功~', icon: 'success' })
     // 重置表单
@@ -89,13 +85,9 @@ const createWish = async () => {
 }
 
 // 取消心愿
-const cancelWish = async (id) => {
+const handleCancelWish = async (id) => {
   try {
-    await request({
-      url: `/wish-meals/${id}/status`,
-      method: 'PUT',
-      data: { status: 'cancelled' }
-    })
+    await updateWishStatus(id, 'cancelled')
     uni.showToast({ title: '已取消', icon: 'success' })
     fetchMyWishes()
   } catch (e) {
@@ -250,7 +242,7 @@ onMounted(() => {
       </view>
 
       <!-- 提交按钮 -->
-      <button class="submit-btn" @click="createWish">
+      <button class="submit-btn" @click="handleCreateWish">
         <u-icon name="heart" color="#fff" size="18"></u-icon>
         <text>许个心愿</text>
       </button>
@@ -294,7 +286,7 @@ onMounted(() => {
                 <view 
                   v-if="wish.status === 'pending'" 
                   class="cancel-btn"
-                  @click.stop="cancelWish(wish.id)"
+                  @click.stop="handleCancelWish(wish.id)"
                 >
                   取消
                 </view>

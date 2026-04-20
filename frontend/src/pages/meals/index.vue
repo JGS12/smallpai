@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { request } from '@/utils/request'
+import { getMeals } from '@/api'
 
 const currentWeek = ref(1)
 const currentCate = ref('全部')
@@ -10,8 +10,9 @@ const categories = ['全部', '早餐', '午餐', '晚餐', '加餐', '汤水']
 
 const fetchMeals = async () => {
   try {
-    const res = await request({ 
-      url: `/meals?week=${currentWeek.value}${currentCate.value !== '全部' ? '&mealType=' + currentCate.value : ''}` 
+    const res = await getMeals({ 
+      week: currentWeek.value,
+      mealType: currentCate.value !== '全部' ? currentCate.value : undefined
     })
     mealList.value = res
   } catch (e) {
